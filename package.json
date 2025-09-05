@@ -22,7 +22,7 @@
     "dev:client": "npm run dev -w client",
     "dev:server": "npm run dev -w server",
     "dev": "concurrently \"npm run dev:shared\" \"npm run dev:client\" \"npm run dev:server\"",
-    "start": "node dist/main.js"
+    "start": "node dist/apps/server/src/main.js"
   },
   "engines": {
     "node": "18.x",
