@@ -1,5 +1,10 @@
 name: Build Docker Image
 
+on:
+  push:
+    branches:
+      - '**'
+
 env:
   REGISTRY_NAME: registry.digitalocean.com/joshnoel
   IMAGE_NAME: game
