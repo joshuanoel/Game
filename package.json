@@ -14,6 +14,7 @@
     "typescript": "^5.2.2"
   },
   "scripts": {
+    "prebuild": "node -v && npm -v",
     "build:shared": "npm run build -w @libs/shared",
     "build:client": "npm run build -w client",
     "build:server": "npm run build -w server",
@@ -23,5 +24,9 @@
     "dev:server": "npm run dev -w server",
     "dev": "concurrently \"npm run dev:shared\" \"npm run dev:client\" \"npm run dev:server\"",
     "start": "node dist/main.js"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
   }
 }
