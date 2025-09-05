@@ -14,7 +14,6 @@
     "typescript": "^5.2.2"
   },
   "scripts": {
-    "prebuild": "node -v && npm -v",
     "build:shared": "npm run build -w @libs/shared",
     "build:client": "npm run build -w client",
     "build:server": "npm run build -w server",
