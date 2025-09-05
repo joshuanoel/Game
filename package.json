@@ -1,0 +1,27 @@
+{
+  "name": "game",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "concurrently": "^8.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build:shared": "npm run build -w @libs/shared",
+    "build:client": "npm run build -w client",
+    "build:server": "npm run build -w server",
+    "build": "npm run build:shared && npm run build:client && npm run build:server",
+    "dev:shared": "npm run dev -w @libs/shared",
+    "dev:client": "npm run dev -w client",
+    "dev:server": "npm run dev -w server",
+    "dev": "concurrently \"npm run dev:shared\" \"npm run dev:client\" \"npm run dev:server\"",
+    "start": "node dist/main.js"
+  }
+}
