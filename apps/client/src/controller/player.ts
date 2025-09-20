@@ -1,23 +1,40 @@
-import { Controller, Player, VectorNormalize, Vector3 } from '@libs/shared';
+import { PlayerController, Player, VectorNormalize, Vector3, PlayerAction, PlayerActionMessage, Vector2 } from '@libs/shared';
 import { ClientGame } from '../game';
 
-export class PlayerController implements Controller {
-  private game: ClientGame;
-
-  private speed: number = 5;
-  private jumpForce: number = 10;
+export class ClientPlayerController extends PlayerController {
+  private clientGame: ClientGame;
 
   constructor(game: ClientGame) {
-    this.game = game;
+    super(game.game);
+    this.clientGame = game;
+  }
+
+  private applyLocalInput(player: Player, input: PlayerAction): void {
+    this.applyInput(player, input);
+
+    const message: PlayerActionMessage = {
+      timestamp: Date.now(),
+      tick: 0,
+      actions: input,
+    };
+    this.clientGame.client.sendPlayerAction(message);
   }
 
   update(player: Player): void {
-    const rotationDelta = this.game.input.getMouseMovement();
+    super.update(player);
+
+    const rotationDelta = this.clientGame.input.getMouseMovement();
     player.rotation = [
       player.rotation[0] + rotationDelta[0],
       player.rotation[1] + rotationDelta[1],
-      player.rotation[2],
+      0,
     ];
+    if (player.rotation[0] >= Math.PI) {
+      player.rotation[0] -= Math.PI * 2;
+    }
+    if (player.rotation[0] <= -Math.PI) {
+      player.rotation[0] += Math.PI * 2;
+    }
     if (player.rotation[1] >= Math.PI / 2 - 0.1) {
       player.rotation[1] = Math.PI / 2 - 0.1;
     }
@@ -25,64 +42,61 @@ export class PlayerController implements Controller {
       player.rotation[1] = -Math.PI / 2 + 0.1;
     }
 
-    player.velocity = [0, player.velocity[1], 0];
-
-    if (this.game.input.isKeyPressed('KeyW')) {
-      const xzForward = VectorNormalize([
-        this.getForwardVector(player)[0],
-        0,
-        this.getForwardVector(player)[2],
-      ]);
-      player.velocity = [
-        player.velocity[0] + xzForward[0] * this.speed,
-        player.velocity[1],
-        player.velocity[2] + xzForward[2] * this.speed,
-      ];
-    }
-    if (this.game.input.isKeyPressed('KeyS')) {
-      const xzBackward = VectorNormalize([
-        this.getForwardVector(player)[0],
-        0,
-        this.getForwardVector(player)[2],
-      ]);
-      player.velocity = [
-        player.velocity[0] - xzBackward[0] * this.speed,
-        player.velocity[1],
-        player.velocity[2] - xzBackward[2] * this.speed,
-      ];
-    }
-    if (this.game.input.isKeyPressed('KeyA')) {
-      player.velocity = [
-        player.velocity[0] + this.getRightVector(player)[0] * this.speed,
-        player.velocity[1] + this.getRightVector(player)[1] * this.speed,
-        player.velocity[2] + this.getRightVector(player)[2] * this.speed,
-      ];
-    }
-    if (this.game.input.isKeyPressed('KeyD')) {
-      player.velocity = [
-        player.velocity[0] - this.getRightVector(player)[0] * this.speed,
-        player.velocity[1] - this.getRightVector(player)[1] * this.speed,
-        player.velocity[2] - this.getRightVector(player)[2] * this.speed,
-      ];
-    }
-    if (this.game.input.isKeyPressed('Space') && player.isGrounded) {
-      player.velocity = [
-        player.velocity[0],
-        player.velocity[1] + this.jumpForce,
-        player.velocity[2],
-      ];
+    const actions: PlayerAction = {
+      move: [0, 0],
+      look: player.rotation,
+      jump: false,
     }
 
-    this.game.client.updatePlayerState({
-      timestamp: Date.now(),
-      state: {
-        id: player.id,
-        type: 'player',
-        position: player.position,
-        velocity: player.velocity,
-        rotation: player.rotation,
-      },
-    });
+    if (this.clientGame.input.isKeyPressed("KeyW")) {
+      const xzForward = this.getXZForwardVector(player);
+      actions.move = [
+        actions.move[0] + xzForward[0],
+        actions.move[1] + xzForward[2],
+      ];
+    }
+    if (this.clientGame.input.isKeyPressed("KeyS")) {
+      const xzForward = this.getXZForwardVector(player);
+      actions.move = [
+        actions.move[0] - xzForward[0],
+        actions.move[1] - xzForward[2],
+      ];
+    }
+    if (this.clientGame.input.isKeyPressed("KeyA")) {
+      const xzRight = this.getXZRightVector(player);
+      actions.move = [
+        actions.move[0] + xzRight[0],
+        actions.move[1] + xzRight[2],
+      ];
+    }
+    if (this.clientGame.input.isKeyPressed("KeyD")) {
+      const xzRight = this.getXZRightVector(player);
+      actions.move = [
+        actions.move[0] - xzRight[0],
+        actions.move[1] - xzRight[2],
+      ];
+    }
+    if (this.clientGame.input.isKeyPressed("Space")) {
+      actions.jump = true;
+    }
+
+    this.applyLocalInput(player, actions)
+  }
+
+  private getXZForwardVector(player: Player): Vector3 {
+    return VectorNormalize([
+      this.getForwardVector(player)[0],
+      0,
+      this.getForwardVector(player)[2],
+    ]);
+  }
+  
+  private getXZRightVector(player: Player): Vector3 {
+    return VectorNormalize([
+      this.getRightVector(player)[0],
+      0,
+      this.getRightVector(player)[2],
+    ]);
   }
 
   private getForwardVector(player: Player): Vector3 {

@@ -1,4 +1,4 @@
-import { Vector3 } from "../math/vector";
+import { Vector2, Vector3 } from "../math/vector";
 
 export type ActorState = {
   id: string;
@@ -6,18 +6,36 @@ export type ActorState = {
   position: Vector3;
   velocity: Vector3;
   rotation: Vector3;
+  size: Vector3;
 };
 
-export type PlayerUpdateMessage = {
+// Player action messages sent from client to server.
+export type PlayerActionMessage = {
   timestamp: number;
-  state: ActorState;
+  tick: number;
+  actions: PlayerAction;
+};
+
+// Input state for a player.
+export type PlayerAction = {
+  // XZ  movement input
+  // Range is [-1, 1]
+  move: Vector2;
+
+  // Look direction input
+  look: Vector3;
+
+  // Whether the player jumps
+  jump: boolean;
 }
 
+// Actor update messages sent from server to clients.
 export type ActorUpdateMessage = {
   timestamp: number;
-  actors : ActorState[];
+  actors: ActorState[];
 };
 
+// Actor delete messages sent from server to clients.
 export type ActorDeleteMessage = {
   timestamp: number;
   id: string;

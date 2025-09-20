@@ -4,12 +4,12 @@ import { Displayable, Uniforms } from './display';
 export class CubeDisplay implements Displayable {
   position: Vector3;
   rotation: Vector3;
-  private size: number;
+  size: Vector3;
   private vao: WebGLVertexArrayObject | null = null;
 
   private colour: Vector3;
 
-  constructor(position: Vector3, size: number, colour?: Vector3) {
+  constructor(position: Vector3, size: Vector3, colour?: Vector3) {
     this.position = position;
     this.rotation = [0, 0, 0];
     this.size = size;
@@ -17,86 +17,37 @@ export class CubeDisplay implements Displayable {
   }
 
   init(gl: WebGL2RenderingContext): void {
-    const halfSize = this.size / 2;
     const vertices = new Float32Array([
       // Front face
-      -halfSize,
-      -halfSize,
-      halfSize,
-      halfSize,
-      -halfSize,
-      halfSize,
-      halfSize,
-      halfSize,
-      halfSize,
-      -halfSize,
-      halfSize,
-      halfSize,
+      0, 0, this.size[2],
+      this.size[0], 0, this.size[2],
+      this.size[0], this.size[1], this.size[2],
+      0, this.size[1], this.size[2],
       // Back face
-      -halfSize,
-      -halfSize,
-      -halfSize,
-      -halfSize,
-      halfSize,
-      -halfSize,
-      halfSize,
-      halfSize,
-      -halfSize,
-      halfSize,
-      -halfSize,
-      -halfSize,
+      0, 0, 0,
+      this.size[0], 0, 0,
+      this.size[0], this.size[1], 0,
+      0, this.size[1], 0,
       // Top face
-      -halfSize,
-      halfSize,
-      -halfSize,
-      -halfSize,
-      halfSize,
-      halfSize,
-      halfSize,
-      halfSize,
-      halfSize,
-      halfSize,
-      halfSize,
-      -halfSize,
+      0, this.size[1], 0,
+      this.size[0], this.size[1], 0,
+      this.size[0], this.size[1], this.size[2],
+      0, this.size[1], this.size[2],
       // Bottom face
-      -halfSize,
-      -halfSize,
-      -halfSize,
-      halfSize,
-      -halfSize,
-      -halfSize,
-      halfSize,
-      -halfSize,
-      halfSize,
-      -halfSize,
-      -halfSize,
-      halfSize,
+      0, 0, 0,
+      this.size[0], 0, 0,
+      this.size[0], 0, this.size[2],
+      0, 0, this.size[2],
       // Right face
-      halfSize,
-      -halfSize,
-      -halfSize,
-      halfSize,
-      halfSize,
-      -halfSize,
-      halfSize,
-      halfSize,
-      halfSize,
-      halfSize,
-      -halfSize,
-      halfSize,
+      this.size[0], 0, 0,
+      this.size[0], this.size[1], 0,
+      this.size[0], this.size[1], this.size[2],
+      this.size[0], 0, this.size[2],
       // Left face
-      -halfSize,
-      -halfSize,
-      -halfSize,
-      -halfSize,
-      -halfSize,
-      halfSize,
-      -halfSize,
-      halfSize,
-      halfSize,
-      -halfSize,
-      halfSize,
-      -halfSize,
+      0, 0, 0,
+      0, this.size[1], 0,
+      0, this.size[1], this.size[2],
+      0, 0, this.size[2],
     ]);
 
     const indices = new Uint16Array([

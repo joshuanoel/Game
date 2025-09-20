@@ -27,9 +27,10 @@ export class ActorFPSCamera implements Camera {
                 Math.cos(pitch) * Math.cos(yaw)
             ])
         }
-        const centre = VectorAdd(this.actor.position, forward)
+        const viewPosition = VectorAdd(this.actor.position, this.actor.size ? [this.actor.size[0] / 2, this.actor.size[1], this.actor.size[2] / 2] : [0.5, 1, 0.5])
+        const centre = VectorAdd(viewPosition, forward)
         const up = NewVector3([0, 1, 0])
-        return NewLookAtMatrix(this.actor.position, centre, up)
+        return NewLookAtMatrix(viewPosition, centre, up)
     }
 }
 

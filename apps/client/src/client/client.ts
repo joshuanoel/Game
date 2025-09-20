@@ -1,4 +1,4 @@
-import { PlayerUpdateMessage, ActorUpdateMessage, ActorDeleteMessage } from '@libs/shared';
+import { PlayerActionMessage, ActorUpdateMessage, ActorDeleteMessage } from '@libs/shared';
 import { io, Socket } from 'socket.io-client';
 
 export class Client {
@@ -29,7 +29,7 @@ export class Client {
     this.socket.on('disconnect', callback);
   }
 
-  updatePlayerState(message: PlayerUpdateMessage) {
+  sendPlayerAction(message: PlayerActionMessage) {
     this.socket.emit('update', message);
   }
 

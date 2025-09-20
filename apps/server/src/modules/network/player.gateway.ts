@@ -6,8 +6,8 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { GameService } from '../modules/game/game.service';
-import { ActorDeleteMessage, ActorState, ActorUpdateMessage, Player, PlayerUpdateMessage } from '@libs/shared';
+import { GameService } from '../game/game.service';
+import { ActorDeleteMessage, ActorState, ActorUpdateMessage, Player, PlayerAction, PlayerActionMessage } from '@libs/shared';
 
 @WebSocketGateway({ cors: true })
 export class PlayerGateway {
@@ -16,21 +16,22 @@ export class PlayerGateway {
   clients: Record<string, Socket> = {};
 
   constructor(private gameService: GameService) {
-    // High-frequency updates
-    setInterval(() => {
-      const players = this.gameService.getPlayers();
-      const message: ActorUpdateMessage = {
-        timestamp: Date.now(),
-        actors: players.map((player): ActorState => ({
-          id: player.id,
-          type: 'player',
-          position: player.position,
-          velocity: player.velocity,
-          rotation: player.rotation,
-        })),
-      };
-      this.server.emit('update', message);
-    }, 1000 / 60);
+    // // High-frequency updates
+    // setInterval(() => {
+    //   const players = this.gameService.getPlayers();
+    //   const message: ActorUpdateMessage = {
+    //     timestamp: Date.now(),
+    //     actors: players.map((player): ActorState => ({
+    //       id: player.id,
+    //       type: 'player',
+    //       position: player.position,
+    //       velocity: player.velocity,
+    //       rotation: player.rotation,
+    //       size: player.size,
+    //     })),
+    //   };
+    //   this.server.emit('update', message);
+    // }, 1000 / 60);
 
     // Low-frequency updates
     setInterval(() => {
@@ -43,10 +44,11 @@ export class PlayerGateway {
           position: actor.position,
           velocity: actor.velocity,
           rotation: actor.rotation ?? [0, 0, 0],
+          size: actor.size ?? [1, 1, 1],
         })),
       };
       this.server.emit('update', message);
-    }, 1000);
+    }, 1000 / 60);
   }
 
   handleConnection(client: Socket) {
@@ -62,6 +64,7 @@ export class PlayerGateway {
         position: actor.position,
         velocity: actor.velocity,
         rotation: actor.rotation ?? [0, 0, 0],
+        size: actor.size ?? [1, 1, 1],
       })),
     };
     client.emit('update', message);
@@ -81,11 +84,8 @@ export class PlayerGateway {
   @SubscribeMessage('update')
   handleUpdate(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: PlayerUpdateMessage,
+    @MessageBody() data: PlayerActionMessage,
   ) {
-    if (data.state.id !== client.id) {
-      throw new Error('Player ID mismatch');
-    }
-    this.gameService.updatePlayer(client.id, data);
+    this.gameService.updatePlayer(client.id, data.actions);
   }
 }

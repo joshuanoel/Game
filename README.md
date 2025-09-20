@@ -59,3 +59,12 @@ The following commands build the entire monorepo and start the backend. The back
 npm run build
 npm start
 ```
+
+### Build and Run with Docker
+
+A `Dockerfile` is provided to build and run the entire monorepo in a Docker container.
+
+```bash
+docker build -t game .
+docker run -p 3000:3000 game
+```

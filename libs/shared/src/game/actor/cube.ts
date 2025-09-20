@@ -10,10 +10,9 @@ export class Cube implements Actor {
   position: Vector3;
   velocity: Vector3;
   collision: CollisionShape;
+  size: Vector3;
 
-  protected size: number;
-
-  constructor(game: Game, id: string, position: Vector3, size: number) {
+  constructor(game: Game, id: string, position: Vector3, size: Vector3) {
     this.game = game;
 
     this.id = id;
@@ -22,14 +21,14 @@ export class Cube implements Actor {
 
     this.collision = {
       min: [
-        position[0] - size / 2,
-        position[1] - size / 2,
-        position[2] - size / 2,
+        position[0],
+        position[1],
+        position[2],
       ],
       max: [
-        position[0] + size / 2,
-        position[1] + size / 2,
-        position[2] + size / 2,
+        position[0] + size[0],
+        position[1] + size[1],
+        position[2] + size[2],
       ],
     };
 
@@ -55,9 +54,9 @@ export class Cube implements Actor {
       }
       if (checkCollision(this.collision, other.collision)) {
         if (dx > 0) {
-          this.position[0] = other.collision.min[0] - this.size / 2;
+          this.position[0] = other.collision.min[0] - this.size[0];
         } else if (dx < 0) {
-          this.position[0] = other.collision.max[0] + this.size / 2;
+          this.position[0] = other.collision.max[0]
         }
       }
     });
@@ -71,9 +70,9 @@ export class Cube implements Actor {
       }
       if (checkCollision(this.collision, other.collision)) {
         if (dy > 0) {
-          this.position[1] = other.collision.min[1] - this.size / 2;
+          this.position[1] = other.collision.min[1] - this.size[1];
         } else if (dy < 0) {
-          this.position[1] = other.collision.max[1] + this.size / 2;
+          this.position[1] = other.collision.max[1];
         }
       }
     });
@@ -87,9 +86,9 @@ export class Cube implements Actor {
       }
       if (checkCollision(this.collision, other.collision)) {
         if (dz > 0) {
-          this.position[2] = other.collision.min[2] - this.size / 2;
+          this.position[2] = other.collision.min[2] - this.size[2];
         } else if (dz < 0) {
-          this.position[2] = other.collision.max[2] + this.size / 2;
+          this.position[2] = other.collision.max[2];
         }
       }
     });
@@ -98,14 +97,14 @@ export class Cube implements Actor {
   private updateCollision(): void {
     this.collision = {
       min: [
-        this.position[0] - this.size / 2,
-        this.position[1] - this.size / 2,
-        this.position[2] - this.size / 2,
+        this.position[0],
+        this.position[1],
+        this.position[2],
       ],
       max: [
-        this.position[0] + this.size / 2,
-        this.position[1] + this.size / 2,
-        this.position[2] + this.size / 2,
+        this.position[0] + this.size[0],
+        this.position[1] + this.size[1],
+        this.position[2] + this.size[2],
       ],
     };
   }

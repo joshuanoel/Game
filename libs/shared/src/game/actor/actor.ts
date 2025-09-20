@@ -7,5 +7,6 @@ export interface Actor {
   velocity: Vector3;
   rotation?: Vector3;
   collision?: CollisionShape;
+  size?: Vector3;
   update(dt: number): void;
 }

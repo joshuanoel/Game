@@ -10,6 +10,11 @@ export class Game {
     this.controllers = new Map<Actor, Controller>();
   }
 
+  reset() {
+    this.actors = [];
+    this.controllers.clear();
+  }
+
   tick(dt: number): void {
     this.actors.forEach((actor) => {
       const controller = this.controllers.get(actor);
